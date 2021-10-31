@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+
+{% block title%}
+Blueprint index page
+{% endblock %}
+
+
+{% block content %}
+<h1> Calculator</h1>
+
+
+<form action=" {{url_for('index')}} " method="post">
+
+    {% if form.non_field_errors %}
+        <div class = 'alert alert-danger'>
+            <p>{{ form.non_field_errors }}</p>
+        </div>
+    {% endif %}
+    {% for field in form %}
+     <div>
+        <p>{{ field.label(class='control-label') }}</p>
+        <p>{{ field() }}</p>
+    </div>
+    {% endfor %}
+    <button type="submit" class="btn btn-primary">Calculate</button>
+    <a href = "">List of all expressions</a>
+
+</form>
+
+{% endblock %}
