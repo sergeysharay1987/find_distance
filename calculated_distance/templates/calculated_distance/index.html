@@ -11,19 +11,18 @@ Blueprint index page
 
 <form action=" {{url_for('index')}} " method="post">
 
-    {% if form.non_field_errors %}
-        <div class = 'alert alert-danger'>
-            <p>{{ form.non_field_errors }}</p>
-        </div>
-    {% endif %}
     {% for field in form %}
-     <div>
-        <p>{{ field.label(class='control-label') }}</p>
+        {% for error in field.errors %}
+            <div class = 'alert alert-danger'>
+                <p>{{ error }}</p>
+            </div>
+        {% endfor %}
+     <div class  = "form-contol">
+        <p>{{ field.label() }}</p>
         <p>{{ field() }}</p>
     </div>
     {% endfor %}
     <button type="submit" class="btn btn-primary">Calculate</button>
-    <a href = "">List of all expressions</a>
 
 </form>
 
