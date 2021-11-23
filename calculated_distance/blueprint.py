@@ -4,7 +4,7 @@ from calculated_distance.forms import CalculateDistanceForm
 from flask import request, flash
 from loguru import logger
 import requests
-
+from .logic import find_distance
 API_KEY = 'cbddbd2c-95ce-4aa1-ba5a-5d0416597c20'
 calculated_distance = Blueprint('calculated_distance', __name__, template_folder='templates')
 
@@ -51,32 +51,27 @@ def get_data_from_response(url):
 def index():
     form = CalculateDistanceForm()
 
-    # if request.method == 'POST':
+    if request.method == 'GET':
+        form = CalculateDistanceForm()
+        print('I am here')
+        return render_template('calculated_distance/index.html', form=form)
 
     if request.method == 'POST':
-        print('It is POST again')
-        if form.errors and form.data:
-            # form = CalculateDistanceForm()
-            return redirect(url_for('calculated_distance.index'))
+
         address = request.form['address']
         bound_form = CalculateDistanceForm(data={'address': address})
         if bound_form.validate():
+            find_distance(bound_form.data.address)
             distance = f'The distance between {address}: '
             bound_form = CalculateDistanceForm(data={'address': address, 'distance': distance})
-
+            logger.add('info.log', format='{time} {message}', level='INFO')
+            logger.info(f'{address}')
             url = make_url(address)
             return redirect(url)
             # return render_template('calculated_distance/index.html', form=bound_form)
-        elif not bound_form.validate() and bound_form.data:
-            return redirect(url_for('calculated_distance.index'))
         elif not bound_form.validate():
             print(f'bound_form.errors still have error {bound_form.errors}')
             print(f'{form} is not pass validation')
             # bound_form = CalculateDistanceForm(address=address)
             print(f'There are errors {bound_form.address.errors}')
             return render_template('calculated_distance/index.html', form=bound_form)
-
-    if request.method == 'GET':
-        form = CalculateDistanceForm()
-        print('I am here')
-        return render_template('calculated_distance/index.html', form=form)
