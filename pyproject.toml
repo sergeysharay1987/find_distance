@@ -9,6 +9,9 @@ python = "^3.8"
 Flask = "^2.0.2"
 WTForms = "^2.3.3"
 loguru = "^0.5.3"
+geopy = "^2.2.0"
+Fiona = "^1.8.20"
+geopandas = "^0.10.2"
 
 [tool.poetry.dev-dependencies]
 

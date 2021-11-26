@@ -1,26 +1,29 @@
 import os
-import geopy
-import matplotlib
+
 import geopandas
-from geopandas import GeoDataFrame
-from matplotlib import pyplot as plt
 import requests
-from matplotlib.pyplot import plot, show
 from openpyxl import Workbook, load_workbook
 from geopandas.tools import geocode
 from geopy.geocoders import Yandex
 from shapely.geometry import Polygon, Point
 from shapely.ops import nearest_points
-from geopy.distance import geodesic, distance
+from geopy.distance import geodesic
 
 API_KEY = 'cbddbd2c-95ce-4aa1-ba5a-5d0416597c20'
+ya_geocoder = Yandex(api_key=API_KEY)
 number_of_mkad_s_kms = 108  # кол-во километров МКАД
 mkad_address = 'Russia Moscow MKAD'  # неизменяющееся часть адреса МКАД
 number_of_km = 0  # номер километра МКАД, начиная с нулевого
 coords_for_polygon_mkad = []
+url = f'https://geocode-maps.yandex.ru/1.x/'
+
+
+
+blueprint = 'calculated_distance'
 
 excel_file = 'coords_of_mkad_s_kms.xlsx'
-
+#path_ex_file = f'{os.getcwd()}/{excel_file}'
+path_ex_file = f'{os.getcwd()}/{blueprint}{excel_file}'
 list_mkad_s_km = []  # список, для хранения координат каждого километра МКАД
 
 list_of_addresses_for_request = []  # список, содержащий urls для HTTP-запросов на геокодирование
@@ -35,17 +38,12 @@ def make_list_of_addresses_for_request():
     splitter = ','
     for number_of_km in range(0, number_of_mkad_s_kms + 1):
         many_addresses += f'{mkad_address} {number_of_km} kilometr vneshnayay storona{splitter}'
-        # list_of_addresses_for_request.append(
-        # f'{mkad_address} {number_of_km} kilometr vneshniaya storona')
-        # number_of_km +=1
-    # print(many_addresses.encode('utf-8'))
-    # print(f'make_list_of_addresses_for_request: {list_of_addresses_for_request}')
     return many_addresses
 
 
 def check_content():
     """Проверяет содержит ли файл координаты всех километров МКАД"""
-    wb = load_workbook(f'./{excel_file}')  # открываем файл
+    wb = load_workbook(excel_file)  # открываем файл
     sheet = wb.active  # получаем текущий активный лист
     for col in sheet.iter_cols(min_col=1, max_col=2, min_row=2, max_row=number_of_mkad_s_kms + 2,
                                values_only=True):
@@ -54,7 +52,7 @@ def check_content():
     return True
 
 
-coords_of_Luhovitsy = Point(54.967192, 39.024195)
+coords_of_Luhovitsy = (54.967192, 39.024195)
 
 
 def create_geodataframe():
@@ -70,11 +68,17 @@ def create_geodataframe():
 # print(longitude)
 # plt.plot(longitude, latitude)
 # plt.show()
+cur_dir = os.getcwd()
+
+print(f'{cur_dir}/{excel_file}')
 
 
 def get_coords(ex_file):
     """Возвращает спсиок, содержащий вложенные списки с координатами каждого километра МКАД"""
-    wb = load_workbook(ex_file)
+
+    path = f'{os.getcwd()}/{blueprint}'
+
+    wb = load_workbook(f'{path}/{ex_file}')
     sheet_1 = wb.active
     for row in sheet_1.iter_rows(min_row=2, max_col=3, max_row=number_of_mkad_s_kms + 2, values_only=True):
         # получаем координаты точек для построения полигона МКАД
@@ -83,57 +87,70 @@ def get_coords(ex_file):
         # меняем местами координаты долготу с широтой, первая координата -  широта, вторая - долгота
         # для получения правильного результата с помощью функции geopy.distance.geodesic
         coords[0], coords[1] = coords[1], coords[0]
-        # print(coords[0], coords[1])
         coords_for_polygon_mkad.append(coords)
-    # print(coords_for_polygon_mkad)
     return coords_for_polygon_mkad
 
 
-def read_ex_file():
-    """Возвращает openpyxl.workbook.workbook.Workbook объект"""
+def get_coords_polygon():
+    """Возвращает список координат всех километров МКАД для построения полигона"""
+    global excel_file
     # file=excel_file
     # проверяем есть ли в текущей директории
-    if excel_file not in os.listdir():
+    if excel_file in os.listdir('.'):
         # открываем файл,
-        return get_coords(excel_file)
+        pass
     # проверяем есть ли excel файл в текущей директории
-    # elif excel_file not in os.listdir() or excel_file in os.listdir() and not check_content():
-    #     # создаём файл, если его не было в текущей директории
-    #     excel_file = create_geodataframe().to_excel(
-    #     excel_writer='./coords_of_mkad_s_kms.xlsx')  # сохраняем координаты МКАД в файл
-
-    # sheet= ex_file.active
-    # return sheet
+    elif excel_file not in os.listdir('.') or excel_file in os.listdir('.') and not check_content():
+        # создаём файл, если его не было в текущей директории
+        excel_file = create_geodataframe().to_excel(
+            excel_writer=f'{os.getcwd()}/{excel_file}')  # сохраняем координаты МКАД в файл
+    return get_coords(excel_file)
 
 
-def show_graghic():
-    latitude = []
-    longitude = []
-    km = 0
-    for point in get_coords(excel_file):
-        # print(f'point {km}: {point}')
-        latitude.append(point[0])
-        longitude.append(point[1])
-        km += 1
-    plt.plot(latitude, longitude)
-    plt.show()
+def geocode_by_http(address):
+    req = requests.get(url, params={'apikey': API_KEY, 'geocode': address, 'format': 'json'})
+    data = req.json()
+    coords = list(
+        map(float, data['response']['GeoObjectCollection']['featureMember'][0]['GeoObject']['Point']['pos'].split()))
+    coords[0], coords[1] = coords[1], coords[0]
+    return coords[0], coords[1]
 
 
-def find_distance(coords_of_Luhovitsy):
+def geocode_address(address):
+    # req = requests.get(url, params={'apikey': API_KEY, 'geocode': address, 'format': 'json'})
+    # data = req.json()
+    # return data['response']['GeoObjectCollection']['featureMember'][0]['GeoObject']['Point']['pos'].split()
+    # ya = Yandex(api_key=API_KEY)
+    coords = ya_geocoder.geocode(address)
+    return coords.latitude, coords.longitude
+
+
+# print(type(geocode_address("Russia, Luhovitsy")))
+
+
+def find_distance(coords_of_address):
     """Возвращает расстояние от МКАД до адреса, введённого в поле формы 'адрес'"""
     # получаем координаты всех километров МКАД из файла
     coords = get_coords(excel_file)
-
-    print(f'coords of mkad: {coords}')
+    print(type(coords_of_address))
+    coords_of_address = Point(coords_of_address)
+    # print(f'coords of mkad: {coords}')
     # создаём полигон из полученных координат
     poly_mkad = Polygon(coords)
-    # находим точку на полигоне, ближайшую к точке, содержащей координаты адреса,
+    if poly_mkad.contains(coords_of_address):
+        return '0'
+    # находим точку на полигоне, ближайшую к точке, содержащей координаты адреса <coords_of_address>,
     # для которого требуется найти расстояние
-    p1, nearest_pt = nearest_points(coords_of_Luhovitsy, poly_mkad)
-    return geodesic((nearest_pt.x, nearest_pt.y), (coords_of_Luhovitsy.x, coords_of_Luhovitsy.y))
+    p1, nearest_pt = nearest_points(coords_of_address, poly_mkad)
+    # print(p1, nearest_pt)
+    return geodesic((nearest_pt.x, nearest_pt.y), (coords_of_address.x, coords_of_address.y))
 
 
-find_distance(coords_of_Luhovitsy)
+# print(find_distance(coords_of_Luhovitsy))
+
+# print(geocode_address('Russia Biorki'))
+print(geocode_by_http('Russia Biorki'))
+# find_distance(coords_of_Luhovitsy)
 
 # p.plot()
 #
