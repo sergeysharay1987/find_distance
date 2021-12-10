@@ -5,13 +5,16 @@ description = ""
 authors = ["Sergey_Sharay"]
 
 [tool.poetry.dependencies]
-python = "^3.8"
+python = "^3.7"
 Flask = "^2.0.2"
 WTForms = "^2.3.3"
 loguru = "^0.5.3"
 geopy = "^2.2.0"
 Fiona = "^1.8.20"
 geopandas = "^0.10.2"
+pytest = "^6.2.5"
+openpyxl = "^3.0.9"
+matplotlib = "^3.5.0"
 
 [tool.poetry.dev-dependencies]
 
