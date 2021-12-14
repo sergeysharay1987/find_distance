@@ -8,7 +8,7 @@ from calculated_distance.logic import *
                         'Russia Ryazan',
                         'Belarus'])
 def get_distance(request):
-    coords_addr = geocode_address(request.param)
+    coords_addr = get_location(request.param)
     coords_addr = Point(coords_addr)
     return find_distance(coords_addr)
 

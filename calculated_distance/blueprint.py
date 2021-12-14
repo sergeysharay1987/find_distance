@@ -16,7 +16,7 @@ def index():
         address = request.form['address']
         bound_form = CalculateDistanceForm(data={'address': address})
         if bound_form.validate():
-            loc_address = get_location(bound_form.data['address'])
+            loc_address = ya_geocoder.geocode(bound_form.data['address'])
             coords_address = Point(loc_address.latitude, loc_address.longitude)
             full_address = loc_address.address
             distance = find_distance(coords_address)
