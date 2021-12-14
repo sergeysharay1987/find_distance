@@ -43,10 +43,6 @@ def create_geodataframe() -> GeoDataFrame:
     return coords_of_mkad_s_kms
 
 
-lan_lon_each: List[float] = []
-lat_lon_coords: List[List[float]] = []
-
-
 def make_lan_lon_coords(gdf: GeoDataFrame) -> List[Point]:
     global list_mkad_s_km
     for point in gdf.geometry:
@@ -81,22 +77,10 @@ def get_polygon(shape_file: str) -> Polygon:
     return poly_mkad
 
 
-# print(f'get_coords(shape_file): {get_polygon(shape_file)}')
-
-
-# for point in get_coords(shape_file):
-#     print(point)
 def get_location(address: str):
     location: Location = ya_geocoder.geocode(address)
     return location
 
-
-# def geocode_address(address: str) -> Point:
-#     """Возвращает кортеж, содержащий широту и долготу"""
-#     coords: Location = ya_geocoder.geocode(address)
-#     # print(coords.raw)
-#     # return coords.latitude, coords.longitude
-#     return Point(coords.latitude, coords.longitude)
 
 def geocode_address(address: str) -> Location:
     """Возвращает кортеж, содержащий широту и долготу"""
