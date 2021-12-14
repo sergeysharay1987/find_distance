@@ -77,16 +77,9 @@ def get_polygon(shape_file: str) -> Polygon:
     return poly_mkad
 
 
-def get_location(address: str):
-    location: Location = ya_geocoder.geocode(address)
-    return location
-
-
-def geocode_address(address: str) -> Location:
+def get_location(address: str) -> Location:
     """Возвращает кортеж, содержащий широту и долготу"""
     location: Location = ya_geocoder.geocode(address)
-    # print(coords.raw)
-    # return coords.latitude, coords.longitude
     return location
 
 
