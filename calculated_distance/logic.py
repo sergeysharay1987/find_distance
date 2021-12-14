@@ -1,19 +1,14 @@
 import os
-from typing import List, Tuple, Union, Dict
-
-import numpy
-import pandas
-import shapely.geometry
+from typing import List, Union, Dict
 from geopandas import GeoDataFrame
 import geopandas
 from geopy import Location
-from openpyxl import load_workbook
 from loguru import logger
 from geopy.geocoders import Yandex
 from shapely.geometry import Polygon, Point
 from shapely.ops import nearest_points
 from geopy.distance import geodesic
-import matplotlib as plt
+
 
 API_KEY = 'cbddbd2c-95ce-4aa1-ba5a-5d0416597c20'
 ya_geocoder: Yandex = Yandex(api_key=API_KEY)  # геокодер, используемый для геокодирования адреса
@@ -24,14 +19,10 @@ number_of_km: int = 0  # номер километра МКАД, начиная 
 coords_mkad: list = []
 url: str = f'https://geocode-maps.yandex.ru/1.x/'
 blueprint: str = 'calculated_distance'
-# excel_file: str = 'coords_of_mkad_s_kms.xlsx'
 shape_file = 'dataframe.shp'
 list_mkad_s_km: List[float] = []  # список, для хранения координат каждого километра МКАД
-# dir_to_excel: str = os.getcwd()  # путь до .xlsx файла
-# dir_to_shape_file: str = os.getcwd() + '/' + blueprint
-
-
-dir_to_shape_file: str = os.getcwd()
+dir_to_shape_file: str = os.getcwd() + '/' + blueprint
+#dir_to_shape_file: str = os.getcwd()
 
 
 def make_list_of_addresses_for_request():
@@ -165,22 +156,3 @@ def make_dict(list_of_toponims: List[str]) -> Dict:
     toponims_of_address = dict(zip(keys, values))
     return toponims_of_address
 
-
-# def get_values(list_of_toponims: List[str]) -> str:
-#     """Преобразует строку, содержащую полный адрес"""
-#     values = [list_of_toponims[i] for i in range(1, len(list_of_toponims), 2)]
-#     return ' '.join(values)
-
-def get_values(address: str):
-    list_toponims = []
-    location: Location = ya_geocoder.geocode(address)
-    print(location.address)
-    toponims_type: List[dict] = location.raw['metaDataProperty']['GeocoderMetaData']['Address']['Components']
-    for item in toponims_type:
-        list_toponims.append(item['kind'])
-        list_toponims.append(item['name'])
-    values = [list_toponims[i] for i in range(1, len(list_toponims), 2)]
-    return ' '.join(values)
-
-
-print(get_values('Беларусь Минск'))
