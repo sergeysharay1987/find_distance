@@ -143,16 +143,4 @@ def get_toponims(address: str) -> List[str]:
     return list_toponims
 
 
-def get_toponims_list(address: Location) -> List[dict]:
-    """Возвращает список"""
-    toponims_type: List[dict] = address.raw['metaDataProperty']['GeocoderMetaData']['Address']['Components']
-    return toponims_type
-
-
-def make_dict(list_of_toponims: List[str]) -> Dict:
-    """Преобразует список словарей, содержащих виды топонимов в словарь, содрежащий виды топонимов и их значения"""
-    keys = [list_of_toponims[i] for i in range(0, len(list_of_toponims), 2)]
-    values = [list_of_toponims[i] for i in range(1, len(list_of_toponims), 2)]
-    toponims_of_address = dict(zip(keys, values))
-    return toponims_of_address
 
