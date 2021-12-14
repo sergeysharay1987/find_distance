@@ -1,5 +1,5 @@
 import os
-from typing import List, Tuple, Union
+from typing import List, Tuple, Union, Dict
 
 import numpy
 import pandas
@@ -24,10 +24,13 @@ number_of_km: int = 0  # номер километра МКАД, начиная 
 coords_mkad: list = []
 url: str = f'https://geocode-maps.yandex.ru/1.x/'
 blueprint: str = 'calculated_distance'
-excel_file: str = 'coords_of_mkad_s_kms.xlsx'
+# excel_file: str = 'coords_of_mkad_s_kms.xlsx'
 shape_file = 'dataframe.shp'
 list_mkad_s_km: List[float] = []  # список, для хранения координат каждого километра МКАД
-dir_to_excel: str = os.getcwd()  # путь до .xlsx файла
+# dir_to_excel: str = os.getcwd()  # путь до .xlsx файла
+# dir_to_shape_file: str = os.getcwd() + '/' + blueprint
+
+
 dir_to_shape_file: str = os.getcwd()
 
 
@@ -40,19 +43,6 @@ def make_list_of_addresses_for_request():
     return many_addresses
 
 
-# print(make_list_of_addresses_for_request())
-
-def check_content():
-    """Проверяет содержит ли файл координаты всех километров МКАД"""
-    wb = load_workbook(excel_file)  # открываем .xlsx файл
-    sheet = wb.active  # получаем текущий активный лист
-    for col in sheet.iter_cols(min_col=1, max_col=2, min_row=2, max_row=number_of_mkad_s_kms + 2,
-                               values_only=True):
-        if 'POINT (' not in col and '0123456789.' not in col[7:-1]:
-            return False
-    return True
-
-
 def create_geodataframe() -> GeoDataFrame:
     """Возвращает GeoDataFrame, содержащий координаты всех километров МКАД"""
     list_of_addresses = make_list_of_addresses_for_request().split(',')
@@ -62,54 +52,67 @@ def create_geodataframe() -> GeoDataFrame:
     return coords_of_mkad_s_kms
 
 
-def get_coords(ex_file: str) -> List[float]:
-    """Возвращает список, содержащий вложенные списки с координатами каждого километра МКАД"""
+lan_lon_each: List[float] = []
+lat_lon_coords: List[List[float]] = []
 
-    wb = load_workbook(f'{dir_to_excel}/{ex_file}')
-    sheet_1 = wb.active
-    for row in sheet_1.iter_rows(min_row=2, max_col=3, max_row=number_of_mkad_s_kms + 2, values_only=True):
-        # получаем координаты точек для построения полигона МКАД
-        coords = row[1].split('(')[-1].replace(')', '').split()
-        coords = list(map(float, coords))
-        # меняем местами координаты долготу с широтой, первая координата - широта, вторая - долгота
-        # для получения правильного результата с помощью функции geopy.distance.geodesic
-        coords[0], coords[1] = coords[1], coords[0]
-        coords_mkad.append(coords)
+
+def make_lan_lon_coords(gdf: GeoDataFrame) -> List[Point]:
+    global list_mkad_s_km
+    for point in gdf.geometry:
+        if isinstance(point, Point):
+            list_mkad_s_km.append(point.y)  # Добавляем первую координату - широту
+            list_mkad_s_km.append(point.x)  # Добавляем первую координату - долготу
+            pt: Point = Point(list_mkad_s_km)
+            coords_mkad.append(pt)  # Добавляем точку Point в список, содержащий координаты точек всех километров МКАД
+            list_mkad_s_km = []  # Очищаем список для последующих итераций
+        elif not isinstance(point, Point):
+            continue
     return coords_mkad
 
 
-# def get_coords_polygon() -> List[float]:
-#     """Возвращает список координат всех километров МКАД для построения полигона"""
-#     # проверяем есть ли в текущей директории
-#     if shape_file in os.listdir(dir_to_excel):
-#         # открываем файл,
-#         return get_coords(excel_file)
-#     # проверяем есть ли excel файл в текущей директории
-#     elif excel_file not in os.listdir('.') or excel_file in os.listdir('.') and check_content():
-#
-#         # создаём .xlsx файл, если его не было в текущей директории и сохраняем в него координаты всех километров МКАД
-#         create_geodataframe().to_excel(
-#             excel_writer=f'{dir_to_excel}/{excel_file}')
-#         return get_coords(excel_file)
-
-
-def get_coords_polygon() -> List[float]:
-    """Возвращает список координат всех километров МКАД для построения полигона"""
-    # проверяем есть ли в текущей директории
-    if shape_file in os.listdir(dir_to_shape_file):
-        # открываем файл,
-
-        return create_geodataframe().to_file(shape_file)
+def check_file():
+    """Проверяет есть ли .shp файл в директории <calculated_distance>"""
     # проверяем есть ли файл .shp в текущей директории
+    if shape_file in os.listdir(dir_to_shape_file):
+        # усли есть ничего не делаем
+        pass
+
     elif shape_file not in os.listdir('.') or shape_file in os.listdir('.'):
         # создаём .shp файл, если его не было в текущей директории и сохраняем в него координаты всех километров МКАД
-        return create_geodataframe().to_file(shape_file)
+        create_geodataframe().to_file(shape_file)
 
 
-def geocode_address(address: str) -> Tuple[float, float]:
+def get_polygon(shape_file: str) -> Polygon:
+    """Возвращает полигон, содержащий координаты точек каждого километра МКАД"""
+    gdf = geopandas.read_file(dir_to_shape_file + '/' + shape_file)
+    coords = make_lan_lon_coords(gdf)
+    poly_mkad = Polygon(coords)
+    return poly_mkad
+
+
+# print(f'get_coords(shape_file): {get_polygon(shape_file)}')
+
+
+# for point in get_coords(shape_file):
+#     print(point)
+def get_location(address: str):
+    location: Location = ya_geocoder.geocode(address)
+    return location
+
+
+# def geocode_address(address: str) -> Point:
+#     """Возвращает кортеж, содержащий широту и долготу"""
+#     coords: Location = ya_geocoder.geocode(address)
+#     # print(coords.raw)
+#     # return coords.latitude, coords.longitude
+#     return Point(coords.latitude, coords.longitude)
+
+def geocode_address(address: str) -> Location:
     """Возвращает кортеж, содержащий широту и долготу"""
-    coords: Location = ya_geocoder.geocode(address)
-    return coords.latitude, coords.longitude
+    location: Location = ya_geocoder.geocode(address)
+    # print(coords.raw)
+    # return coords.latitude, coords.longitude
+    return location
 
 
 def write_in_log(address: str, distance: float):
@@ -121,90 +124,63 @@ def write_in_log(address: str, distance: float):
 def find_distance(coords_of_address) -> Union[int, float]:
     """Возвращает расстояние в километрах от МКАД до адреса, введённого в поле формы 'адрес'"""
     # получаем координаты всех километров МКАД из .xlsx файла
-    coords = get_coords_polygon()
-    coords_of_address = Point(coords_of_address)
-    # создаём полигон из полученных координат
-    poly_mkad = Polygon(coords)
-    #    g = geopandas.read_file(excel_file)
-    # g.plot()
-    # plt.show()
+    check_file()
+    poly_mkad = get_polygon(shape_file)
+    print(f'find_distance: {poly_mkad.contains(coords_of_address)}')
     if poly_mkad.contains(coords_of_address):
         return 0
     # находим точку на полигоне, ближайшую к точке, содержащей координаты адреса <coords_of_address>,
     # для которого требуется найти расстояние
     else:
-        p1, nearest_pt = nearest_points(coords_of_address, poly_mkad)  # ищем точку (nearest_pt) на МКАД,
+        # ищем точку (nearest_pt) на МКАД,
         # расположенную ближе всего к
         # точке, с координатами адреса, расстояние до которого требуется найти
+        p1, nearest_pt = nearest_points(coords_of_address, poly_mkad)
+        print(f'nearest_pt: {nearest_pt}')
         distance = geodesic((nearest_pt.x, nearest_pt.y), (coords_of_address.x, coords_of_address.y))
         return round(distance.km, 1)
 
 
-# file = geopandas.read_file(f'{os.getcwd()}/RUS_adm/RUS_adm2.shp')
-# #var = file.var()
-# #print(type(file))
-# #print(file.columns)
-# #print(file.get('NAME_1', 'Moskva'))
-# #print(file.head())
-# # for name in file['NAME_1'].values:
-# #     if name == 'Moskva':
-# #         print(name)
-# #print(file['NAME_1'].values)
-# #print(file['NAME_2'].values)
-# #print(var)
-# file.plot()
-# coords_Moscow = geocode_address('Moscow')
-# find_distance(coords_Moscow)
-gdf = geopandas.read_file(dir_to_shape_file + '/' + shape_file)
-# gdf = gdf[]
-# gdf.plot()
-# gdf.drop()
-# print(gdf['geometry'][0])
-# for pt in gdf.address:
-#     #if not isinstance(pt, Point):
-#
-#     print(pt)
-# gdf.set_geometry(col = 0)
-# print(gdf)
-lat_lon_coords = []
-lan_lon_each = []
+def get_toponims(address: str) -> List[str]:
+    """Возвращает список словарей, содержащих виды топонимов и значения этих топонимов"""
+    list_toponims = []
+    location: Location = ya_geocoder.geocode(address)
+    toponims_type: List[dict] = location.raw['metaDataProperty']['GeocoderMetaData']['Address']['Components']
+    for item in toponims_type:
+        list_toponims.append(item['kind'])
+        list_toponims.append(item['name'])
+    return list_toponims
 
-for point in gdf.geometry:
-    # print(point)
-    if isinstance(point, Point):
-        # print(point.xy)
-        lan_lon_each.append(point.y)
-        lan_lon_each.append(point.x)
-        # print(point.y, point.x)
-        lat_lon_coords.append(Point(lan_lon_each))
 
-        lan_lon_each = []
-    else:
-        break
-        # gdf.drop(point)
-coords = numpy.array(lat_lon_coords, dtype=object)
-polygon = Polygon(lat_lon_coords)
+def get_toponims_list(address: Location) -> List[dict]:
+    """Возвращает список"""
+    toponims_type: List[dict] = address.raw['metaDataProperty']['GeocoderMetaData']['Address']['Components']
+    return toponims_type
 
-print(geocode_address('Moscow'))
-print(polygon.contains(Point(geocode_address('Russia Moscow'))))
-# gdf_poly = GeoDataFrame(polygon)
-print(polygon)
-print(coords.dtype)
-print(type(coords))
-gdf['geometry'] = pandas.Series(coords)
-# print(gdf['geometry'])
-print(gdf)
-gdf.plot()
 
-# gdf.set_geometry(lat_lon_coords)
-# print(gdf)
-# print(lat_lon_coords[108])
-# gdf_1 = GeoDataFrame(lat_lon_coords)
-# gdf_1.set_geometry(col = lat_lon_coords)
-# print(gdf_1.rename())
-# gdf_1.rename()
-# gdf_1.set_geometry(lat_lon_coords)
-# gdf[0] = gdf['geometry']
-# print(gdf_1)
-# gdf.set_geometry(lat_lon_coords[:108])
-# print(gdf)
+def make_dict(list_of_toponims: List[str]) -> Dict:
+    """Преобразует список словарей, содержащих виды топонимов в словарь, содрежащий виды топонимов и их значения"""
+    keys = [list_of_toponims[i] for i in range(0, len(list_of_toponims), 2)]
+    values = [list_of_toponims[i] for i in range(1, len(list_of_toponims), 2)]
+    toponims_of_address = dict(zip(keys, values))
+    return toponims_of_address
+
+
+# def get_values(list_of_toponims: List[str]) -> str:
+#     """Преобразует строку, содержащую полный адрес"""
+#     values = [list_of_toponims[i] for i in range(1, len(list_of_toponims), 2)]
+#     return ' '.join(values)
+
+def get_values(address: str):
+    list_toponims = []
+    location: Location = ya_geocoder.geocode(address)
+    print(location.address)
+    toponims_type: List[dict] = location.raw['metaDataProperty']['GeocoderMetaData']['Address']['Components']
+    for item in toponims_type:
+        list_toponims.append(item['kind'])
+        list_toponims.append(item['name'])
+    values = [list_toponims[i] for i in range(1, len(list_toponims), 2)]
+    return ' '.join(values)
+
+
+print(get_values('Беларусь Минск'))
