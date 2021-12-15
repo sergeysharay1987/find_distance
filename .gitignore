@@ -1,0 +1,11 @@
+bootstrap-4.4.1-dist
+db.sqlite3
+.idea
+../.idea/
+__pycache__
+*.pyc
+# Default ignored files
+/workspace.xml
+*.xml
+calculator/tests/db_for_tests.json
+db_for_tests.json
