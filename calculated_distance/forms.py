@@ -1,10 +1,7 @@
+from geopy import Location
 from wtforms import Form, TextField, TextAreaField
 from wtforms.validators import DataRequired, ValidationError
-from .logic import ya_geocoder
-
-set_nessesary = {'country', 'locality', 'street'}
-nessesary_info_1 = {'country', 'locality', 'house'}
-nessesary_info_2 = {'country', 'locality', 'metro'}
+from calculated_distance.logic import ya_geocoder
 
 
 class CalculateDistanceForm(Form):
@@ -16,6 +13,9 @@ class CalculateDistanceForm(Form):
 
     def validate_address(form, field):
         address: str = field.data
+        loc_address: Location = ya_geocoder.geocode(address)
+        if loc_address.address == 'Москва, Россия':
+            raise ValidationError('Need more information, try to add street or district')
         if address.isdigit():
             raise ValidationError('Incorrect data')
         try:
