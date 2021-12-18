@@ -15,7 +15,6 @@ ya_geocoder: Yandex = Yandex(api_key=API_KEY)  # геокодер, исполь�
 mkad_s_kms: int = 108  # кол-во километров МКАД
 mkad_address: str = 'Россия Москва МКАД'  # неизменяющееся часть адреса МКАД, используемая для формирования адреса
 # каждого км МКАД
-number_of_km: int = 0  # номер километра МКАД, начиная с нулевого
 coords_mkad: list = []
 blueprint: str = 'calculated_distance'
 shape_file = 'dataframe.shp'
@@ -59,7 +58,7 @@ def check_file():
     """Проверяет есть ли .shp файл в директории <calculated_distance>"""
     # проверяем есть ли файл .shp в текущей директории
     if shape_file in os.listdir(dir_to_shape_file):
-        # если есть ничего не делаем
+        # если .shp файл, есть ничего не делаем
         pass
 
     elif shape_file not in os.listdir('.') or shape_file in os.listdir('.'):
@@ -88,10 +87,12 @@ def find_distance(coords_of_address) -> Union[int, float]:
     poly_mkad = get_polygon(shape_file)
     print(f'find_distance: {poly_mkad.contains(coords_of_address)}')
     if poly_mkad.contains(coords_of_address):
+        print(f'coords_of_address if poly_mkad.contains(coords_of_address):{coords_of_address}')
         return 0
     # находим точку на полигоне, ближайшую к точке, содержащей координаты адреса <coords_of_address>,
     # для которого требуется найти расстояние
-    else:
+    elif not poly_mkad.contains(coords_of_address):
+        print(f'coords_of_address elif not poly_mkad.contains(coords_of_address):{coords_of_address}')
         # ищем точку (nearest_pt) на МКАД,
         # расположенную ближе всего к
         # точке, с координатами адреса, расстояние до которого требуется найти
