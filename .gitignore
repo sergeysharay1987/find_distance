@@ -2,7 +2,7 @@ bootstrap-4.4.1-dist
 .pytest_cache
 .idea
 __pycache__
-calculated_distance/__pycache__
+/calculated_distance/__pycache__/
 *.pyc
 # Default ignored files
 /workspace.xml
