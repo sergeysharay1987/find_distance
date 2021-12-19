@@ -35,7 +35,6 @@
     ```
     git clone git@github.com:sergeysharay1987/find_distance.git
     ```
-
 10. Установить Poetry и все необходимые зависимости из poetry:
     ```
     pip install poetry 
