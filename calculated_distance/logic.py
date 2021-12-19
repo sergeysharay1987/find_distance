@@ -75,7 +75,6 @@ def check_file() -> None:
 def get_polygon(shp_file: str) -> Polygon:
     """Возвращает полигон, содержащий координаты точек каждого километра МКАД"""
     calculated_distance_path = get_blprt_root()
-    # gdf = geopandas.read_file(dir_to_file + '/' + shp_file)
     gdf = geopandas.read_file(calculated_distance_path + '/' + shp_file)
     coords = make_lan_lon_coords(gdf)
     poly_mkad = Polygon(coords)
@@ -83,7 +82,6 @@ def get_polygon(shp_file: str) -> Polygon:
 
 
 def write_in_log(address: str, distance: float):
-    #path = f'{os.getcwd()}/{blueprint}/info.log'
     path = get_blprt_root()
     logger.add(path, format='{time} {message}', level='INFO')
     logger.info(f'Расстояние от МКАД до {address} равно {distance} км')

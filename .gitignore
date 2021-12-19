@@ -1,5 +1,5 @@
 bootstrap-4.4.1-dist
-db.sqlite3
+.pytest_cache
 .idea
 ../.idea/
 __pycache__
@@ -9,3 +9,8 @@ __pycache__
 *.xml
 calculator/tests/db_for_tests.json
 db_for_tests.json
+*.shp
+*.cpg
+*.dbf
+*.shx
+*.prj
