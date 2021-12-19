@@ -1,2 +1,2 @@
-class Configuration():
+class Configuration:
     DEBUG = True
