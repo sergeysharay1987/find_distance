@@ -1,15 +1,17 @@
 from flask import Blueprint, render_template
-from calculated_distance.forms import CalculateDistanceForm
+from distance_MKAD.forms import CalculateDistanceForm
 from flask import request
-from calculated_distance.logic import *
+from distance_MKAD.logic import *
 
-calculated_distance = Blueprint('calculated_distance', __name__, template_folder='templates')
+distance_MKAD = Blueprint('distance_MKAD', __name__, template_folder='templates')
+distance_MKAD.root_path
 
 
-@calculated_distance.route('/', methods=['POST', 'GET'])
+@distance_MKAD.route('/', methods=['POST', 'GET'])
 def index():
     if request.method == 'GET':
         form = CalculateDistanceForm()
+        print(f'blueprint_root: {blueprint}')
         return render_template('calculated_distance/index.html', form=form)
 
     if request.method == 'POST':

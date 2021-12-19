@@ -1,24 +1,15 @@
-import pytest
-from django.core.management import call_command
-from django.test.client import Client
-from web_calculator.settings import BASE_DIR
-from calculator.views import *
-# from pytest_django.asserts
+from werkzeug.test import Client
 
-# define variable containing names of context's keys in views.py
-_keys_of_context_using_in_views = ['form', 'expression', 'expressions', 'expression']
+from werkzeug.testapp import test_app
+
+c = Client(test_app)
+
+response = c.get("/")
 
 
-@pytest.fixture(scope='session')
-def django_db_setup(django_db_setup, django_db_blocker):
-    with django_db_blocker.unblock():
-        call_command('loaddata', BASE_DIR +'/db_for_tests.json')
 
 
-@pytest.fixture(params=[reverse('details', kwargs={'id': 100}),  # /calculator/database/100/
-                        reverse('delete', kwargs={'id': 35}),  # /calculator/database/35/delete/
-                        reverse('database'),  # /calculator/database
-                        reverse('index')])  # /calculator/
+response.status_code
 def make_response(request):
     path = request.param
     client = Client()

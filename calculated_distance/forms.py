@@ -14,10 +14,10 @@ class CalculateDistanceForm(Form):
     def validate_address(form, field):
         address: str = field.data
         loc_address: Location = ya_geocoder.geocode(address)
-        if loc_address.address == 'Москва, Россия':
-            raise ValidationError('Need more information, try to add street or district')
-        if address.isdigit():
-            raise ValidationError('Incorrect data')
+        # if loc_address.address == 'Москва, Россия':
+        #     raise ValidationError('Need more information, try to add street or district')
+        # if address.isdigit():
+        #     raise ValidationError('Incorrect data')
         try:
             ya_geocoder.geocode(address)
         except (AttributeError, TypeError):

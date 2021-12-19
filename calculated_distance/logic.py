@@ -1,14 +1,17 @@
 import os
 from typing import List, Union
-from geopandas import GeoDataFrame
 import geopandas
-from geopy import Location
-from loguru import logger
+from geopandas import GeoDataFrame
+from geopy.distance import geodesic
 from geopy.geocoders import Yandex
+from loguru import logger
 from shapely.geometry import Polygon, Point
 from shapely.ops import nearest_points
-from geopy.distance import geodesic
+from .blueprint import blueprint_root
+#from app import application
+from app import application
 
+app_root = application.root_path
 
 API_KEY = 'cbddbd2c-95ce-4aa1-ba5a-5d0416597c20'
 ya_geocoder: Yandex = Yandex(api_key=API_KEY)  # геокодер, используемый для геокодирования адреса
@@ -19,7 +22,7 @@ coords_mkad: list = []
 blueprint: str = 'calculated_distance'
 shape_file = 'dataframe.shp'
 list_mkad_s_km: List[float] = []  # список, для хранения координат каждого километра МКАД
-dir_to_shape_file: str = os.getcwd() + '/' + blueprint
+dir_to_file: str = os.getcwd() + '/' + blueprint
 
 
 def make_list_of_addresses_for_request():
@@ -54,10 +57,11 @@ def make_lan_lon_coords(gdf: GeoDataFrame) -> List[Point]:
     return coords_mkad
 
 
-def check_file():
+def check_file() -> None:
     """Проверяет есть ли .shp файл в директории <calculated_distance>"""
+    print(f'dir_to_shape_file: {dir_to_file}')
     # проверяем есть ли файл .shp в текущей директории
-    if shape_file in os.listdir(dir_to_shape_file):
+    if shape_file in os.listdir(dir_to_file):
         # если .shp файл, есть ничего не делаем
         pass
 
@@ -68,7 +72,7 @@ def check_file():
 
 def get_polygon(shp_file: str) -> Polygon:
     """Возвращает полигон, содержащий координаты точек каждого километра МКАД"""
-    gdf = geopandas.read_file(dir_to_shape_file + '/' + shp_file)
+    gdf = geopandas.read_file(dir_to_file + '/' + shp_file)
     coords = make_lan_lon_coords(gdf)
     poly_mkad = Polygon(coords)
     return poly_mkad
@@ -100,4 +104,3 @@ def find_distance(coords_of_address) -> Union[int, float]:
         print(f'nearest_pt: {nearest_pt}')
         distance = geodesic((nearest_pt.x, nearest_pt.y), (coords_of_address.x, coords_of_address.y))
         return round(distance.km, 1)
-
