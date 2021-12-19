@@ -28,7 +28,6 @@
     sudo usermod -aG docker ${USER}
     выход
     ```
-
 8. Форк https://github.com/sergeysharay1987/find_distance репозиторий
 
 9. Клонируем репозиторий:
