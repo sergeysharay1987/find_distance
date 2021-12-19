@@ -20,6 +20,7 @@ def index():
             coords_address = Point(loc_address.latitude, loc_address.longitude)
             full_address = loc_address.address
             distance = find_distance(coords_address)
+            write_in_log(full_address, distance)
             bound_form = CalculateDistanceForm(data={'address': address,
                                                      'full_address': full_address,
                                                      'distance': distance})
