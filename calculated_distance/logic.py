@@ -82,7 +82,7 @@ def get_polygon(shp_file: str) -> Polygon:
 
 
 def write_in_log(address: str, distance: float):
-    path = get_blprt_root()
+    path = get_blprt_root() + '/' + 'info.log'
     logger.add(path, format='{time} {message}', level='INFO')
     logger.info(f'Расстояние от МКАД до {address} равно {distance} км')
 
