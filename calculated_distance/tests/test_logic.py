@@ -1,6 +1,6 @@
 import pytest
 from geopy import Location
-from calculated_distance.logic import *
+from calculated_distance.logic import Point, ya_geocoder, find_distance
 
 
 @pytest.fixture(params=['Russia Luhovitsy',
@@ -14,4 +14,3 @@ def get_distance(request):
 
 def test_find_distance(get_distance):
     assert isinstance(get_distance, float)
-
