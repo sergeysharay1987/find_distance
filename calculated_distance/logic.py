@@ -8,6 +8,7 @@ from loguru import logger
 from shapely.geometry import Polygon, Point
 from shapely.ops import nearest_points
 
+
 API_KEY = 'cbddbd2c-95ce-4aa1-ba5a-5d0416597c20'
 ya_geocoder: Yandex = Yandex(api_key=API_KEY)  # геокодер, используемый для геокодирования адреса
 mkad_s_kms: int = 108  # кол-во километров МКАД
