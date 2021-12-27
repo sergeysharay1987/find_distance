@@ -1,5 +1,7 @@
 bootstrap-4.4.1-dist
 .python-version
+cache/
+calculated_distance/cache/
 .pytest_cache
 .idea
 __pycache__
