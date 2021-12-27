@@ -5,10 +5,10 @@ from flask import request
 from mkad_distance.logic import ya_geocoder, find_distance, write_in_log, Point
 
 name: str = 'mkad_distance'
-calculated_distance: Blueprint = Blueprint(name, __name__, template_folder='templates')
+mkad_distance: Blueprint = Blueprint(name, __name__, template_folder='templates')
 
 
-@calculated_distance.route('/', methods=['POST', 'GET'])
+@mkad_distance.route('/', methods=['POST', 'GET'])
 def index():
     if request.method == 'GET':
         form = CalculateDistanceForm()
