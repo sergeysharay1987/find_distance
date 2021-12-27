@@ -53,8 +53,8 @@ def make_lan_lon_coords(gdf: GeoDataFrame) -> List[Point]:
 
 def get_blprt_root():
     """Возвращает путь до директории "mkad_distance" """
-    from calculated_distance.blueprint import calculated_distance
-    return calculated_distance.root_path
+    from mkad_distance.blueprint import mkad_distance
+    return mkad_distance.root_path
 
 
 def check_file() -> None:
@@ -74,7 +74,7 @@ def check_file() -> None:
 def get_polygon(shp_file: str) -> Polygon:
     """Возвращает полигон, содержащий координаты точек каждого километра МКАД"""
     calculated_distance_path = get_blprt_root()
-    gdf = geopandas.read_file(calculated_distance_path + '/' + shp_file)
+    gdf = geopandas.read_file(calculated_distance_path + '/data/' + shp_file)
     coords = make_lan_lon_coords(gdf)
     poly_mkad = Polygon(coords)
     return poly_mkad
