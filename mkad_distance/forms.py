@@ -1,7 +1,7 @@
 from geopy import Location
 from wtforms import Form, TextField, TextAreaField
 from wtforms.validators import DataRequired, ValidationError
-from calculated_distance.logic import ya_geocoder
+from mkad_distance.logic import ya_geocoder
 
 
 class CalculateDistanceForm(Form):
