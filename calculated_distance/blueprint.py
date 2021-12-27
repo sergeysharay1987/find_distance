@@ -17,14 +17,15 @@ def index():
         address = request.form['address']
         bound_form = CalculateDistanceForm(data={'address': address})
         if bound_form.validate():
-            loc_address: Location = ya_geocoder.geocode(bound_form.data['address'])
+            address = bound_form.data['address']
+            loc_address: Location = ya_geocoder.geocode(address)
             coords_address: Point = Point(loc_address._tuple[1])
             full_address = loc_address.address
-            distance = find_distance(coords_address)
-            write_in_log(full_address, distance)
+            #distance = find_distance(coords_address)
             bound_form = CalculateDistanceForm(data={'address': address,
                                                      'full_address': full_address,
-                                                     'distance': distance})
+                                                     'distance': find_distance(coords_address)})
+            write_in_log(full_address, find_distance(coords_address))
             return render_template('calculated_distance/index.html', form=bound_form)
         elif not bound_form.validate():
             return render_template('calculated_distance/index.html', form=bound_form)
