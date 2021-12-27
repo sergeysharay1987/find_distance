@@ -21,7 +21,6 @@ def index():
             loc_address: Location = ya_geocoder.geocode(address)
             coords_address: Point = Point(loc_address._tuple[1])
             full_address = loc_address.address
-            #distance = find_distance(coords_address)
             bound_form = CalculateDistanceForm(data={'address': address,
                                                      'full_address': full_address,
                                                      'distance': find_distance(coords_address)})
