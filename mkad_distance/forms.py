@@ -13,7 +13,7 @@ class CalculateDistanceForm(Form):
 
     def validate_address(form, field):
         address: str = field.data
-        location = ya_geocoder.geocode(address)
+        location: Location = ya_geocoder.geocode(address)
         if not isinstance(location, Location) or '_*^!~' in address:
             raise ValidationError('Поле адрес должно содержать по крайней мере '
                                   'название страны или название населённого '
