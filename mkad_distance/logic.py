@@ -51,7 +51,7 @@ def make_lan_lon_coords(gdf: GeoDataFrame) -> List[Point]:
     return coords_mkad
 
 
-def get_blprt_root() -> None:
+def get_blprt_root() -> str:
     """Возвращает путь до директории "mkad_distance" """
     from mkad_distance.blueprint import mkad_distance
     return mkad_distance.root_path
