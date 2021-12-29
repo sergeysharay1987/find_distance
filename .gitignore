@@ -1,19 +1,11 @@
-bootstrap-4.4.1-dist
 .python-version
-cache/
-calculated_distance/cache/
-.pytest_cache
+*.log
+*.pyc
+/cache/
+mkad_distance/.idea
+mkad_distance/cache/
+mkad_distance/.pytest_cache
+mkad_distance/data
 .idea
 __pycache__
-/calculated_distance/__pycache__/
-*.pyc
 # Default ignored files
-/workspace.xml
-*.xml
-calculator/tests/db_for_tests.json
-db_for_tests.json
-*.shp
-*.cpg
-*.dbf
-*.shx
-*.prj
