@@ -51,44 +51,43 @@ def make_lan_lon_coords(gdf: GeoDataFrame) -> List[Point]:
     return coords_mkad
 
 
-def get_blprt_root():
+def get_blprt_root() -> None:
     """Возвращает путь до директории "mkad_distance" """
     from mkad_distance.blueprint import mkad_distance
     return mkad_distance.root_path
 
 
 def check_file() -> None:
-    calculated_distance_path = get_blprt_root()
     """Проверяет есть ли .shp файл в директории <mkad_distance>"""
-    # проверяем есть ли файл .shp в текущей директории
+    path_shp: str = f'{get_blprt_root()}/data'
     # if shape_file in os.listdir(dir_to_file):
-    if shape_file in os.listdir(calculated_distance_path):
+    if shape_file in os.listdir(path_shp):
         # если .shp файл, есть ничего не делаем
         pass
 
-    elif shape_file not in os.listdir(calculated_distance_path):
+    elif shape_file not in os.listdir(path_shp):
         # создаём .shp файл, если его не было в текущей директории и сохраняем в него координаты всех километров МКАД
         create_geodataframe().to_file(shape_file)
 
 
 def get_polygon(shp_file: str) -> Polygon:
     """Возвращает полигон, содержащий координаты точек каждого километра МКАД"""
-    calculated_distance_path = get_blprt_root()
-    gdf = geopandas.read_file(calculated_distance_path + '/data/' + shp_file)
+    blueprint_path = get_blprt_root()
+    gdf: GeoDataFrame = geopandas.read_file(f'{blueprint_path}/data/{shp_file}')
     coords = make_lan_lon_coords(gdf)
     poly_mkad = Polygon(coords)
     return poly_mkad
 
 
-def write_in_log(address: str, distance: float):
-    path = get_blprt_root() + '/' + 'info.log'
+def write_in_log(address: str, distance: float) -> None:
+    """Записывает результат расчёта в .log файл"""
+    path: str = f'{get_blprt_root()}/info.log'  # путь до .log файла
     logger.add(path, format='{time} {message}', level='INFO')
-    logger.info(f'Расстояние от МКАД до {address} равно {distance} км')
+    logger.info(f'Расстояние: МКАД - {address} равно {distance} км')
 
 
 def find_distance(coords_of_address) -> Union[int, float]:
     """Возвращает расстояние в километрах от МКАД до адреса, введённого в поле формы 'адрес'"""
-    # получаем координаты всех километров МКАД из .xlsx файла
     check_file()
     poly_mkad = get_polygon(shape_file)
     if poly_mkad.contains(coords_of_address):
