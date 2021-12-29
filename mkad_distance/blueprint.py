@@ -4,7 +4,7 @@ from mkad_distance.forms import CalculateDistanceForm
 from flask import request
 from .logic import ya_geocoder, find_distance, write_in_log, Point
 
-blprt_name: str = 'mkad_distance'  # название папки blueprint
+blprt_name: str = 'mkad_distance'  # название blueprint'а и название папки расположения blueprint'а
 mkad_distance: Blueprint = Blueprint(blprt_name, __name__, template_folder='templates')
 
 
