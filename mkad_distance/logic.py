@@ -14,7 +14,6 @@ mkad_s_kms: int = 108  # кол-во километров МКАД
 mkad_address: str = 'Россия Москва МКАД'  # неизменяющееся часть адреса МКАД, используемая для формирования адреса
 # каждого км МКАД
 coords_mkad: list = []
-blueprint: str = 'mkad_distance'
 shape_file = 'dataframe.shp'
 list_mkad_s_km: List[float] = []  # список, для хранения координат каждого километра МКАД
 
@@ -53,51 +52,48 @@ def make_lan_lon_coords(gdf: GeoDataFrame) -> List[Point]:
 
 def get_blprt_root() -> str:
     """Возвращает путь до директории "mkad_distance" """
-    from mkad_distance.blueprint import mkad_distance
+    from .blueprint import mkad_distance
     return mkad_distance.root_path
 
 
-def check_file() -> None:
-    """Проверяет есть ли .shp файл в директории <mkad_distance>"""
-    path_shp: str = f'{get_blprt_root()}/data'
+def check_file(path: str) -> None:
+    """Проверяет есть ли .shp файл в директории 'path' """
+    # path_shp: str = f'{get_blprt_root()}/data'
+    # path_shp: str = f'{os.getcwd()}/data'
     # if shape_file in os.listdir(dir_to_file):
-    if shape_file in os.listdir(path_shp):
+    if shape_file in os.listdir(path):
         # если .shp файл, есть ничего не делаем
         pass
 
-    elif shape_file not in os.listdir(path_shp):
+    elif shape_file not in os.listdir(path):
         # создаём .shp файл, если его не было в текущей директории и сохраняем в него координаты всех километров МКАД
         create_geodataframe().to_file(shape_file)
 
 
-def get_polygon(shp_file: str) -> Polygon:
+def get_polygon(shp_file: str, path) -> Polygon:
     """Возвращает полигон, содержащий координаты точек каждого километра МКАД"""
-    blueprint_path = get_blprt_root()
-    gdf: GeoDataFrame = geopandas.read_file(f'{blueprint_path}/data/{shp_file}')
+    # blueprint_path = get_blprt_root()
+    # blueprint_path = os.getcwd()
+    gdf: GeoDataFrame = geopandas.read_file(f'{path}/{shp_file}')
     coords = make_lan_lon_coords(gdf)
     poly_mkad = Polygon(coords)
     return poly_mkad
 
 
-def write_in_log(address: str, distance: float) -> None:
+def write_in_log(address: str, distance: float, path) -> None:
     """Записывает результат расчёта в .log файл"""
-    path: str = f'{get_blprt_root()}/info.log'  # путь до .log файла
+    path: str = f'{path}/info.log'  # путь до .log файла
     logger.add(path, format='{time} {message}', level='INFO')
-    logger.info(f'Расстояние: МКАД - {address} равно {distance} км')
+    logger.info(f'Расстояние: МКАД - {address} равно {distance}')
 
 
-def find_distance(coords_of_address) -> Union[int, float]:
+def find_distance(coords_of_address: Point, polygon: Polygon) -> Union[float, int]:
     """Возвращает расстояние в километрах от МКАД до адреса, введённого в поле формы 'адрес'"""
-    check_file()
-    poly_mkad = get_polygon(shape_file)
-    if poly_mkad.contains(coords_of_address):
-        return 0
-    # находим точку на полигоне, ближайшую к точке, содержащей координаты адреса <coords_of_address>,
-    # для которого требуется найти расстояние
-    elif not poly_mkad.contains(coords_of_address):
-        # ищем точку (nearest_pt) на МКАД,
-        # расположенную ближе всего к
-        # точке, с координатами адреса, расстояние до которого требуется найти
-        p1, nearest_pt = nearest_points(coords_of_address, poly_mkad)
-        distance = geodesic((nearest_pt.x, nearest_pt.y), (coords_of_address.x, coords_of_address.y))
-        return round(distance.km, 1)
+    # ищем точку (nearest_pt) на МКАД,
+    # расположенную ближе всего к
+    # точке, с координатами адреса, расстояние до которого (адреса) требуется найти
+    p1, nearest_pt = nearest_points(coords_of_address, polygon)
+    distance = geodesic((nearest_pt.x, nearest_pt.y), (coords_of_address.x, coords_of_address.y))
+    if distance.km % 1 == 0:
+        return int(distance.km)
+    return round(distance.km, 1)
