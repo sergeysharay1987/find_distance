@@ -87,7 +87,7 @@ def write_in_log(address: str, distance: float, path) -> None:
     logger.info(f'Расстояние: МКАД - {address} равно {distance}')
 
 
-def find_distance(coords_of_address: Point, polygon: Polygon) -> Union[float, int]:
+def find_distance(coords_of_address: Point, polygon: Polygon) -> Union[int, float]:
     """Возвращает расстояние в километрах от МКАД до адреса, введённого в поле формы 'адрес'"""
     # ищем точку (nearest_pt) на МКАД,
     # расположенную ближе всего к
