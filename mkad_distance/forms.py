@@ -26,7 +26,6 @@ class CalculateDistanceForm(Form):
             raise ValidationError('Поле адрес должно содержать по крайней мере '
                                        'название страны или название населённого'
                                        'пункта или и то и другое')
-        #return address
 
     def __str__(self):
         return f'address: {self.address}, full_address: {self.full_address}, distance: {self.distance}'
