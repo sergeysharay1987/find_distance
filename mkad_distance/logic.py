@@ -98,4 +98,4 @@ def find_distance(coords_of_address: Point, polygon: Polygon) -> str:
         distance = int(round(distance.km, 1))
     else:
         distance = round(distance.km, 1)
-    return f'{distance} km'
+    return f'{distance} км'
