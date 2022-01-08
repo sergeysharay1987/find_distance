@@ -1,8 +1,8 @@
 .python-version
-*.log
 *.pyc
 /cache/
 mkad_distance/.idea
+mkad_distance/info.log
 mkad_distance/cache/
 mkad_distance/.pytest_cache
 mkad_distance/data
