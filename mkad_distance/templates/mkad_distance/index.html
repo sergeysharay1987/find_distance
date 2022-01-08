@@ -8,7 +8,12 @@
 {% block content %}
 <h1> Расчитать расстояние </h1>
 
+{% for cat, msg in get_flashed_messages(with_categories=True) %}
 
+    <div class = 'alert alert-{{ cat }}'>
+        <p>{{ msg }} </p>
+    </div>
+{% endfor %}
 <form action=" {{ url_for('mkad_distance.index') }} " method="post">
 
     {% for field in form %}
