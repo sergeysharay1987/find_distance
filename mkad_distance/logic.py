@@ -80,20 +80,22 @@ def get_polygon(shp_file: str, path) -> Polygon:
     return poly_mkad
 
 
-def write_in_log(address: str, distance: float, path) -> None:
+def write_in_log(address: str, distance: str, path) -> None:
     """Записывает результат расчёта в .log файл"""
     path: str = f'{path}/info.log'  # путь до .log файла
     logger.add(path, format='{time} {message}', level='INFO')
     logger.info(f'Расстояние: МКАД - {address} равно {distance}')
 
 
-def find_distance(coords_of_address: Point, polygon: Polygon) -> Union[int, float]:
+def find_distance(coords_of_address: Point, polygon: Polygon) -> str:
     """Возвращает расстояние в километрах от МКАД до адреса, введённого в поле формы 'адрес'"""
     # ищем точку (nearest_pt) на МКАД,
     # расположенную ближе всего к
     # точке, с координатами адреса, расстояние до которого (адреса) требуется найти
     p1, nearest_pt = nearest_points(coords_of_address, polygon)
     distance = geodesic((nearest_pt.x, nearest_pt.y), (coords_of_address.x, coords_of_address.y))
-    if distance.km % 1 == 0:
-        return int(distance.km)
-    return round(distance.km, 1)
+    if round(distance.km, 1) % 1 == 0:
+        distance = int(round(distance.km, 1))
+    else:
+        distance = round(distance.km, 1)
+    return f'{distance} km'
