@@ -23,6 +23,7 @@ def check_str(string: str):
         return False
 
 
+
 class CalculateDistanceForm(Form):
     """Форма для расчёта геодезического расстояния"""
     address: str = TextAreaField('Адрес', validators=[
