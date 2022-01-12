@@ -17,24 +17,23 @@
     ```
 3. Установите необходимые компоненты (как указано на странице https://github.com/pyenv/pyenv/wiki/Common-build-problems:
 4. Установите и настройте pyenv как указано на странице https://github.com/pyenv/pyenv#basic-github-checkout:
+5. Установите Docker согласно https://docs.docker.com/engine/install/ (известная работа: Docker версии 20.10.1, сборка 831ebea)
 
-5. Установите Python:
-    ```
-    pyenv установить 3.7.1
-    pyenv local 3.7.1 # запускать из корня этого репо (должен появиться файл `.python-version`)
-    ```
-6. Установите Docker согласно https://docs.docker.com/engine/install/ (известная работа: Docker версии 20.10.1, сборка 831ebea)
-
-7. Добавьте своего пользователя в группу докеров:
+6. Добавьте своего пользователя в группу докеров:
     ```
     sudo usermod -aG docker ${USER}
     выход
     ```
-8. Форк https://github.com/sergeysharay1987/find_distance репозиторий
+7. Форк https://github.com/sergeysharay1987/find_distance репозиторий
 
-9. Клонируем репозиторий:
+8. Клонируем репозиторий:
     ```
     git clone git@github.com:sergeysharay1987/find_distance.git
+    ```
+9. Установите Python:
+    ```
+    pyenv install 3.7.1
+    pyenv local 3.7.1 # запускать из корня этого репо (должен появиться файл `.python-version`)
     ```
 10. Установить Poetry:
     ```
