@@ -1,6 +1,6 @@
 from wtforms import Form, TextField, TextAreaField
 from wtforms.validators import DataRequired, ValidationError
-from .logic import ya_geocoder
+
 
 def check_all_chars(string: str):
     """Функция возвращает True, если строка содержит допустимые символы, в противном случае возвращает False"""
