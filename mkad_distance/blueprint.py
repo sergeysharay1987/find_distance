@@ -1,9 +1,8 @@
 from flask import Blueprint, render_template
-from geopy import Location
 from mkad_distance.forms import CalculateDistanceForm
 from flask import request
 from shapely.geometry import Point
-from .logic import ya_geocoder, shape_file, check_file, get_polygon, find_distance, write_in_log
+from .logic import shape_file, check_file, get_polygon, find_distance, write_in_log
 from flask import flash
 
 blprt_name: str = 'mkad_distance'  # название blueprint'а и название папки расположения blueprint'а
