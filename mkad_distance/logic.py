@@ -72,8 +72,6 @@ def check_file(path: str) -> None:
 
 def get_polygon(shp_file: str, path) -> Polygon:
     """Возвращает полигон, содержащий координаты точек каждого километра МКАД"""
-    # blueprint_path = get_blprt_root()
-    # blueprint_path = os.getcwd()
     gdf: GeoDataFrame = geopandas.read_file(f'{path}/{shp_file}')
     coords = make_lan_lon_coords(gdf)
     poly_mkad = Polygon(coords)
