@@ -31,7 +31,9 @@ def index():
             try:
                 coords_address: Point = Point(loc_address._tuple[1])
             except AttributeError:
-                flash('Wrong', category='danger')
+                flash('Введите корректный адрес', category='danger')
+                bound_form.full_address.data = ''
+                bound_form.distance.data = ''
             else:
                 full_address = loc_address.address
                 distance = find_distance(coords_address, poly_mkad)
