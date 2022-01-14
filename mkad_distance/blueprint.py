@@ -21,33 +21,32 @@ def index():
         return render_template(f'{blprt_name}/index.html', form=form)
 
     if request.method == 'POST':
+        
         data = request.form.copy()
         bound_form = CalculateDistanceForm(data=data)
         if bound_form.validate():
-
+    
             check_file(data_dir)
             address = bound_form.data['address']
-            loc_address: Location = ya_geocoder.geocode(address)
-            try:
-                coords_address: Point = Point(loc_address._tuple[1])
-            except AttributeError:
-                flash('Wrong', category='danger')
-            else:
-                full_address = loc_address.address
-                distance = find_distance(coords_address, poly_mkad)
-                if full_address == 'Москва, Россия':
+            full_address = bound_form.location.address
+            coords_address = Point(bound_form.location._tuple[-1])
+            
+            if full_address == 'Москва, Россия':
                     flash('Уточните пожалуйста адрес. Добавьте например название населённого пункта или улицы, '
                           'номер дома', category='warning')
                     distance = ''
-                elif poly_mkad.contains(coords_address):
-                    flash('Адрес находится внутри МКАД', category='info')
-                    distance = ''
-
-                bound_form = CalculateDistanceForm(data={'address': address,
-                                                         'full_address': full_address,
-                                                         'distance': f'{distance}'})
-                if distance:
-                    write_in_log(full_address, distance, blpt_root)
+                    full_address = ''
+            elif poly_mkad.contains(coords_address):
+                flash('Адрес находится внутри МКАД', category='info')
+                distance = ''
+                full_address = ''
+            elif not poly_mkad.contains(coords_address):
+                distance = find_distance(coords_address, poly_mkad)
+            bound_form = CalculateDistanceForm(data={'address': address,
+                                                     'full_address': full_address,
+                                                     'distance': distance})
+            if bound_form['distance']:
+                write_in_log(address, distance, blpt_root)
             return render_template(f'{blprt_name}/index.html', form=bound_form)
         elif not bound_form.validate():
             bound_form.full_address.data = ''
