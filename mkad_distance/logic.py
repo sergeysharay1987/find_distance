@@ -1,5 +1,5 @@
 import os
-from typing import List, Union
+from typing import List
 import geopandas
 from geopandas import GeoDataFrame
 from geopy.distance import geodesic
