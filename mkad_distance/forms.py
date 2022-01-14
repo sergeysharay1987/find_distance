@@ -1,10 +1,9 @@
 from wtforms import Form, TextField, TextAreaField
 from wtforms.validators import DataRequired, ValidationError
 from .logic import ya_geocoder
-from geopy import Location
 
 
-def check_all_chars(string: str):
+def check_chars(string: str):
     """Функция возвращает True, если строка содержит допустимые символы, в противном случае возвращает False"""
     for char in string:
         # проверяем, что символ не буква или цифра
@@ -20,7 +19,7 @@ def check_str(string: str):
     """Функция возвращает True, если строка содержит допустимые символы, в противном случае возвращает False"""
     splitted_str = string.split()
     for word in splitted_str:
-        if check_all_chars(word):
+        if check_chars(word):
             return True
         return False
 
@@ -40,5 +39,5 @@ class CalculateDistanceForm(Form):
 
     def validate_address(self, field):
         address: str = field.data
-        if not isinstance(self.location, Location) or not check_str(address):
+        if not check_str(address):
             raise ValidationError('Поле адрес содержит недопустимый символ(ы)')

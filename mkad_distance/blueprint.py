@@ -16,37 +16,38 @@ poly_mkad = get_polygon(shape_file, data_dir)
 @mkad_distance.route('/', methods=['POST', 'GET'])
 def index():
     if request.method == 'GET':
-
         form = CalculateDistanceForm()
         return render_template(f'{blprt_name}/index.html', form=form)
 
     if request.method == 'POST':
-        
+
         data = request.form.copy()
         bound_form = CalculateDistanceForm(data=data)
         if bound_form.validate():
-    
+
             check_file(data_dir)
             address = bound_form.data['address']
-            full_address = bound_form.location.address
-            coords_address = Point(bound_form.location._tuple[-1])
-            
-            if full_address == 'Москва, Россия':
+            if not bound_form.location:
+                flash('Такого адреса не существует.', category='warning')
+            else:
+                full_address = bound_form.location.address
+                coords_address = Point(bound_form.location._tuple[-1])
+
+                if full_address == 'Москва, Россия':
                     flash('Уточните пожалуйста адрес. Добавьте например название населённого пункта или улицы, '
                           'номер дома', category='warning')
-                    distance = ''
-                    full_address = ''
-            elif poly_mkad.contains(coords_address):
-                flash('Адрес находится внутри МКАД', category='info')
-                distance = ''
-                full_address = ''
-            elif not poly_mkad.contains(coords_address):
+                    bound_form.distance.data = bound_form.full_address.data = ''
+                elif poly_mkad.contains(coords_address):
+                    flash('Адрес находится внутри МКАД', category='info')
+                    bound_form.distance.data = bound_form.full_address.data = ''
+
                 distance = find_distance(coords_address, poly_mkad)
-            bound_form = CalculateDistanceForm(data={'address': address,
-                                                     'full_address': full_address,
-                                                     'distance': distance})
-            if bound_form['distance']:
-                write_in_log(address, distance, blpt_root)
+                bound_form = CalculateDistanceForm(data={'address': address,
+                                                         'full_address': full_address,
+                                                         'distance': distance})
+                if bound_form['distance']:
+
+                    write_in_log(address, distance, blpt_root)
             return render_template(f'{blprt_name}/index.html', form=bound_form)
         elif not bound_form.validate():
             bound_form.full_address.data = ''
