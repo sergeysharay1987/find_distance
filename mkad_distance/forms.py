@@ -30,7 +30,7 @@ class CalculateDistanceForm(Form):
     
     
     """Форма для расчёта геодезического расстояния"""
-    address: str = TextAreaField('Адрес', validators=[
+    address = TextAreaField('Адрес', validators=[
         DataRequired('Пожалуйста, введите адрес')])
     full_address = TextAreaField('Полный адрес', render_kw={'readonly': True})
     distance = TextField('Расстояние', render_kw={'readonly': True})
