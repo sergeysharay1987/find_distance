@@ -1,5 +1,8 @@
 from wtforms import Form, TextField, TextAreaField
 from wtforms.validators import DataRequired, ValidationError
+from .logic import ya_geocoder
+from geopy import Location
+
 
 
 def check_all_chars(string: str):
@@ -24,16 +27,23 @@ def check_str(string: str):
 
 
 class CalculateDistanceForm(Form):
+    
+    
     """Форма для расчёта геодезического расстояния"""
     address: str = TextAreaField('Адрес', validators=[
         DataRequired('Пожалуйста, введите адрес')])
     full_address = TextAreaField('Полный адрес', render_kw={'readonly': True})
     distance = TextField('Расстояние', render_kw={'readonly': True})
-
-    def validate_address(form, field):
+    
+    @property
+    def location(self):
+        address = self.address.data
+        location = ya_geocoder.geocode(address)
+        return location
+    
+    def validate_address(self, field):
         address: str = field.data
-        if not check_str(address):
+        if not isinstance(self.location, Location) or not check_str(address):
             raise ValidationError('Поле адрес содержит недопустимый символ(ы)')
-
-    def __str__(self):
-        return f'address: {self.address}, full_address: {self.full_address}, distance: {self.distance}'
+        #else:
+            return self.address
