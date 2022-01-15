@@ -43,7 +43,7 @@ def index():
                     flash('Адрес находится внутри МКАД', category='info')
                     distance = ''
                 else:
-                    distance = find_distance(coords_address, poly_mkad)
+                    distance = f'{find_distance(coords_address, poly_mkad)} km'
                 bound_form = CalculateDistanceForm(data={'address': address,
                                                          'full_address': full_address,
                                                          'distance': distance})
