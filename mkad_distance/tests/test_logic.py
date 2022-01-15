@@ -13,4 +13,4 @@ def get_distance(request):
 
 
 def test_find_distance(get_distance):
-    assert isinstance(get_distance, float)
+    assert isinstance(get_distance, (float, int))
