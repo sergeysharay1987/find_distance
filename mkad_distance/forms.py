@@ -3,23 +3,11 @@ from wtforms.validators import DataRequired, ValidationError
 from .logic import ya_geocoder
 
 
-def check_chars(string: str):
-    """Функция возвращает True, если строка содержит допустимые символы, в противном случае возвращает False"""
-    for char in string:
-        # проверяем, что символ не буква или цифра
-        if not char.isalnum():
-            return False
-        # если символ буква или цифра, то прерываем текущую итерацию
-        continue
-    # проверяем, что последний символ либо буква, либо запятая
-    return True
-
-
 def check_str(string: str):
     """Функция возвращает True, если строка содержит допустимые символы, в противном случае возвращает False"""
     splitted_str = string.split()
     for word in splitted_str:
-        if check_chars(word):
+        if word.isalnum() or word[-1] == ',' or word[-1] == ' ':
             return True
         return False
 
