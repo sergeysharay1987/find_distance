@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template
+from flask import Blueprint, render_template, session, get_flashed_messages
 from mkad_distance.forms import CalculateDistanceForm
 from flask import request
 from shapely.geometry import Point
@@ -15,6 +15,7 @@ poly_mkad = get_polygon(shape_file, data_dir)
 @mkad_distance.route('/', methods=['POST', 'GET'])
 def index():
     if request.method == 'GET':
+
         form = CalculateDistanceForm()
         return render_template(f'{blprt_name}/index.html', form=form)
 
@@ -33,7 +34,6 @@ def index():
             else:
                 full_address = bound_form.location.address
                 coords_address = Point(bound_form.location._tuple[-1])
-
                 if full_address == 'Москва, Россия':
                     flash('Уточните пожалуйста адрес. Добавьте например название населённого пункта или улицы, '
                           'номер дома', category='warning')
@@ -47,7 +47,7 @@ def index():
                 bound_form = CalculateDistanceForm(data={'address': address,
                                                          'full_address': full_address,
                                                          'distance': distance})
-                if bound_form['distance']:
+                if distance:
 
                     write_in_log(full_address, distance, blpt_root)
             return render_template(f'{blprt_name}/index.html', form=bound_form)
