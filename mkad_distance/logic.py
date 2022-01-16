@@ -8,6 +8,7 @@ from loguru import logger
 from shapely.geometry import Polygon, Point
 from shapely.ops import nearest_points
 
+
 API_KEY = 'cbddbd2c-95ce-4aa1-ba5a-5d0416597c20'
 ya_geocoder: Yandex = Yandex(api_key=API_KEY)  # геокодер, используемый для геокодирования адреса
 mkad_s_kms: int = 108  # кол-во километров МКАД
@@ -72,8 +73,6 @@ def check_file(path: str) -> None:
 
 def get_polygon(shp_file: str, path) -> Polygon:
     """Возвращает полигон, содержащий координаты точек каждого километра МКАД"""
-    # blueprint_path = get_blprt_root()
-    # blueprint_path = os.getcwd()
     gdf: GeoDataFrame = geopandas.read_file(f'{path}/{shp_file}')
     coords = make_lan_lon_coords(gdf)
     poly_mkad = Polygon(coords)
@@ -87,7 +86,7 @@ def write_in_log(address: str, distance: str, path) -> None:
     logger.info(f'Расстояние: МКАД - {address} равно {distance}')
 
 
-def find_distance(coords_of_address: Point, polygon: Polygon) -> str:
+def find_distance(coords_of_address: Point, polygon: Polygon) -> Union[float, int]:
     """Возвращает расстояние в километрах от МКАД до адреса, введённого в поле формы 'адрес'"""
     # ищем точку (nearest_pt) на МКАД,
     # расположенную ближе всего к
@@ -98,4 +97,4 @@ def find_distance(coords_of_address: Point, polygon: Polygon) -> str:
         distance = int(round(distance.km, 1))
     else:
         distance = round(distance.km, 1)
-    return f'{distance} км'
+    return distance

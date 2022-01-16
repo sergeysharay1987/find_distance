@@ -3,6 +3,7 @@ from geopy import Location
 from mkad_distance.logic import Point, ya_geocoder, find_distance
 from mkad_distance.blueprint import poly_mkad
 
+
 @pytest.fixture(params=['Russia Luhovitsy',
                         'Russia Ryazan',
                         'Belarus'])
@@ -13,4 +14,4 @@ def get_distance(request):
 
 
 def test_find_distance(get_distance):
-    assert isinstance(get_distance, float)
+    assert isinstance(get_distance, (float, int))
