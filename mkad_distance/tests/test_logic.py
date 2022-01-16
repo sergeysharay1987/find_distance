@@ -3,6 +3,7 @@ from geopy import Location
 from mkad_distance.logic import Point, ya_geocoder, find_distance
 from mkad_distance.blueprint import poly_mkad
 
+
 @pytest.fixture(params=['Russia Luhovitsy',
                         'Russia Ryazan',
                         'Belarus'])
