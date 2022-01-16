@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, session, get_flashed_messages
+from flask import Blueprint, render_template
 from mkad_distance.forms import CalculateDistanceForm
 from flask import request
 from shapely.geometry import Point
